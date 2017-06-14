@@ -88,7 +88,7 @@ func (service *Service) UpdateDocumentReference(documentHandle DocumentHandle, p
 
 // UpdateUWI updates the value for a UWI type field on a document
 func (service *Service) UpdateUWI(documentHandle DocumentHandle, path []string, field string, value string) error {
-	if err := service.invokeJSON("/api/Documents/Field/UpdateUWI", updateUwiRequest{
+	if err := service.invokeJSON("/api/Documents/Field/UpdateUwi", updateUwiRequest{
 		AuthenticationToken: service.AuthenticationToken,
 		DocumentHandle:      documentHandle,
 		FieldPath:           path,
