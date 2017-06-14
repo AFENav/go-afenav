@@ -3,8 +3,8 @@ package afenav
 // DocumentID represents the unique ID for a document (a GUID)
 type DocumentID string
 
-// AuthenticationToken is a string that represents a user session
-type AuthenticationToken string
+// authenticationToken is a string that represents a user session
+type authenticationToken string
 
 // DocumentHandle represents an open handle to a document in AFE Nav
 type DocumentHandle string
@@ -12,28 +12,19 @@ type DocumentHandle string
 // ListItemID represents a record in a document list
 type ListItemID string
 
-// DocumentHandleRequest represents a basic request for an in-memory document
-type DocumentHandleRequest struct {
-	AuthenticationToken AuthenticationToken
+// documentHandleRequest represents a basic request for an in-memory document
+type documentHandleRequest struct {
+	AuthenticationToken authenticationToken
 	DocumentHandle      string
 }
 
-// AuthenticationTokenRequest represents a basic authenticated request
-type AuthenticationTokenRequest struct {
-	AuthenticationToken AuthenticationToken
+// authenticationTokenRequest represents a basic authenticated request
+type authenticationTokenRequest struct {
+	AuthenticationToken authenticationToken
 }
 
-// Error is the standard format for unexpected exceptions from AFE Nav
-type Error struct {
+// serviceError is the standard format for unexpected exceptions from AFE Nav
+type serviceError struct {
 	ClassName string
 	Message   string
-}
-
-// Config represents the configuration for an AFE Nav with user credentials
-type Config struct {
-	URL                string
-	Username           string
-	Password           string
-	InsecureSkipVerify bool
-	LogRequests        bool
 }

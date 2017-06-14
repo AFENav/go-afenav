@@ -10,38 +10,24 @@ import (
 
 	"fmt"
 
-	"github.com/BurntSushi/toml"
 	"github.com/op/go-logging"
 )
 
-// Service represents an instance of an AFE Navigator service with configuration and state
+// Service represents an instance of an AFE Navigator Service with configuration and state
 type Service struct {
-	Config              Config
-	Log                 *logging.Logger
-	AuthenticationToken AuthenticationToken
+	url string
+	log *logging.Logger
+
+	InsecureSkipVerify  bool
+	AuthenticationToken authenticationToken
+	LogRequests         bool
 }
 
-func NewFromConfig(filename string) (*Service, error) {
-	var config Config
-	if _, err := toml.DecodeFile(filename, &config); err != nil {
-		return nil, err
-	}
-
+// New returns a new instance of an AFE Navigator Service
+func New(url string) *Service {
 	return &Service{
-		Config: config,
-		Log:    logging.MustGetLogger("afenav"),
-	}, nil
-}
-
-func New(url string, username string, password string, insecureSkipVerify bool) *Service {
-	return &Service{
-		Config: Config{
-			URL:                url,
-			Username:           username,
-			Password:           password,
-			InsecureSkipVerify: insecureSkipVerify,
-		},
-		Log: logging.MustGetLogger("afenav"),
+		url: url,
+		log: logging.MustGetLogger("afenav"),
 	}
 }
 
@@ -52,24 +38,24 @@ func New(url string, username string, password string, insecureSkipVerify bool) 
 func (service *Service) invokeJSON(api string, request interface{}, response interface{}) error {
 	requestJSON, err := json.Marshal(request)
 	if err != nil {
-		service.Log.Errorf("Failure invoking %v: %v", api, err)
+		service.log.Errorf("Failure invoking %v: %v", api, err)
 		return err
 	}
 
 	responseBytes, err := service.invoke(api, requestJSON)
 	if err != nil {
-		service.Log.Errorf("Failure invoking %v: %v", api, err)
+		service.log.Errorf("Failure invoking %v: %v", api, err)
 		return err
 	}
 
 	if response != nil {
 		if err := json.Unmarshal(responseBytes, &response); err != nil {
-			service.Log.Errorf("Failure invoking %v: %v", api, err)
+			service.log.Errorf("Failure invoking %v: %v", api, err)
 			return err
 		}
 	}
 
-	service.Log.Debugf("Successfully invoked %v", api)
+	service.log.Debugf("Successfully invoked %v", api)
 	return nil
 }
 
@@ -77,7 +63,7 @@ func (service *Service) invoke(api string, request []byte) ([]byte, error) {
 
 	// TLS configuration to bypass TLS check if we are using a self-signed cert
 	tlsClientConfig := &tls.Config{
-		InsecureSkipVerify: service.Config.InsecureSkipVerify,
+		InsecureSkipVerify: service.InsecureSkipVerify,
 	}
 
 	tr := &http.Transport{
@@ -88,9 +74,9 @@ func (service *Service) invoke(api string, request []byte) ([]byte, error) {
 
 	client := &http.Client{Transport: tr}
 
-	req, _ := http.NewRequest("POST", service.Config.URL+api, bytes.NewReader(request))
+	req, _ := http.NewRequest("POST", service.url+api, bytes.NewReader(request))
 
-	// indicate to AFE Nav service that we're calling the JSON APIs (as opposed to XML)
+	// indicate to AFE Nav Service that we're calling the JSON APIs (as opposed to XML)
 	req.Header.Add("Content-type", "application/json")
 
 	resp, err := client.Do(req)
@@ -99,14 +85,14 @@ func (service *Service) invoke(api string, request []byte) ([]byte, error) {
 	}
 
 	if resp.StatusCode == http.StatusInternalServerError {
-		// If we get a 500, decode the result and parse into an Error object
-		var afeNavError Error
+		// If we get a 500, decode the result and parse into an serviceError object
+		var serviceError serviceError
 		decoder := json.NewDecoder(resp.Body)
-		err = decoder.Decode(&afeNavError)
+		err = decoder.Decode(&serviceError)
 		if err != nil {
 			return nil, err
 		}
-		return nil, errors.New(afeNavError.Message)
+		return nil, errors.New(serviceError.Message)
 	}
 
 	if resp.StatusCode == http.StatusNotFound {
@@ -118,7 +104,7 @@ func (service *Service) invoke(api string, request []byte) ([]byte, error) {
 
 	response := responseBuffer.Bytes()
 
-	if service.Config.LogRequests {
+	if service.LogRequests {
 		detailMessage := new(bytes.Buffer)
 
 		detailMessage.WriteString("POST: " + api + "\n")
@@ -135,7 +121,7 @@ func (service *Service) invoke(api string, request []byte) ([]byte, error) {
 			detailMessage.Write(response)
 		}
 
-		service.Log.Debug(detailMessage)
+		service.log.Debug(detailMessage)
 	}
 	return response, nil
 }
