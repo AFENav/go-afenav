@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;go-afenav&gt;">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../.." />
+      <root url="file://$PROJECT_DIR$/../../../golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../ennav" />
+    </CLASSES>
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../.." />
+      <root url="file://$PROJECT_DIR$/../../../golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../ennav" />
+    </SOURCES>
+    <excluded>
+      <root url="file://$PROJECT_DIR$/../sample/API/AFE/Go/create" />
+      <root url="file://$PROJECT_DIR$" />
+    </excluded>
+  </library>
+</component>
