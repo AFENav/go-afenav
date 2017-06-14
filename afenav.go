@@ -1,3 +1,4 @@
+// Package afenav contains wrapper methods for integrating with the AFE Navigator 2017 APIs
 package afenav
 
 import (
