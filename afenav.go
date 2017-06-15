@@ -47,7 +47,6 @@ func (service *Service) invokeJSON(api string, request interface{}, response int
 		return err
 	}
 
-
 	if response != nil {
 		if err := json.Unmarshal(responseBytes, &response); err != nil {
 			service.log.Errorf("Failure invoking %v: %v", api, err)
@@ -56,7 +55,6 @@ func (service *Service) invokeJSON(api string, request interface{}, response int
 	}
 
 	service.log.Debugf("Successfully invoked %v", api)
-
 
 	if service.LogRequests {
 		detailMessage := new(bytes.Buffer)
