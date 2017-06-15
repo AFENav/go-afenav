@@ -15,7 +15,7 @@ type UwiValue struct {
 
 // DocumentField represents a field and value from the document read call
 type DocumentField struct {
-	ID                 string `json:"Id"`
+	ID                 string `json:"ID"`
 	Text               string
 	Bool               bool
 	NumberDecimal      float64
@@ -92,5 +92,26 @@ func (service *Service) ReadDocument(handle DocumentHandle, serializeDocumentTyp
 		return nil, err
 	}
 
+	return &response, nil
+}
+
+type readCurrentRequest struct {
+	DocumentID             DocumentID `json:"DocumentId"`
+	DocumentType           string
+	SerializeDocumentTypes []string
+	AuthenticationToken    authenticationToken
+}
+
+// ReadCurrent returns a snapshot of the current data for a document
+func (service *Service) ReadCurrent(documentType string, documentID DocumentID, serializeDocumentTypes []string) (*DocumentReadResponse, error) {
+	var response DocumentReadResponse
+	if err := service.invokeJSON("/api/Documents/ReadCurrent", readCurrentRequest{
+		AuthenticationToken:    service.AuthenticationToken,
+		DocumentType:           documentType,
+		DocumentID:             documentID,
+		SerializeDocumentTypes: serializeDocumentTypes,
+	}, &response); err != nil {
+		return nil, err
+	}
 	return &response, nil
 }
