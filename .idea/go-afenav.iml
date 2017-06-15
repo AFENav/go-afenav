@@ -5,7 +5,6 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="create" />
     <orderEntry type="library" name="GOPATH &lt;go-afenav&gt;" level="project" />
   </component>
   <component name="TestRunnerService">
