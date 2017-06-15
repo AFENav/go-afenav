@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"time"
 
-	"fmt"
-
 	"github.com/op/go-logging"
 )
 
@@ -37,17 +35,18 @@ func New(url string) *Service {
 // invokeJSON calls an JSON API marshalling the request object, and unmarshalling into the response object
 // response will be nil of error != nil
 func (service *Service) invokeJSON(api string, request interface{}, response interface{}) error {
-	requestJSON, err := json.Marshal(request)
+	requestBytes, err := json.Marshal(request)
 	if err != nil {
 		service.log.Errorf("Failure invoking %v: %v", api, err)
 		return err
 	}
 
-	responseBytes, err := service.invoke(api, requestJSON)
+	responseBytes, err := service.invoke(api, requestBytes)
 	if err != nil {
 		service.log.Errorf("Failure invoking %v: %v", api, err)
 		return err
 	}
+
 
 	if response != nil {
 		if err := json.Unmarshal(responseBytes, &response); err != nil {
@@ -57,6 +56,20 @@ func (service *Service) invokeJSON(api string, request interface{}, response int
 	}
 
 	service.log.Debugf("Successfully invoked %v", api)
+
+
+	if service.LogRequests {
+		detailMessage := new(bytes.Buffer)
+
+		detailMessage.WriteString("POST: " + api + "\n")
+		detailMessage.WriteString("\nRequest:\n")
+		json.Indent(detailMessage, requestBytes, "", " ")
+		detailMessage.WriteString("\n\nResponse:\n")
+		json.Indent(detailMessage, responseBytes, "", " ")
+
+		service.log.Debug(detailMessage)
+	}
+
 	return nil
 }
 
@@ -103,37 +116,6 @@ func (service *Service) invoke(api string, request []byte) ([]byte, error) {
 	responseBuffer := new(bytes.Buffer)
 	responseBuffer.ReadFrom(resp.Body)
 
-	response := responseBuffer.Bytes()
+	return responseBuffer.Bytes(), nil
 
-	if service.LogRequests {
-		detailMessage := new(bytes.Buffer)
-
-		detailMessage.WriteString("POST: " + api + "\n")
-		detailMessage.WriteString("\nHeaders:\n")
-		for headerName, headerValue := range req.Header {
-			detailMessage.WriteString(fmt.Sprintf("  %v: %v\n", headerName, headerValue))
-		}
-		detailMessage.WriteString("\nRequest:\n")
-		if err = writeJSON(detailMessage, request); err != nil {
-			detailMessage.Write(request)
-		}
-		detailMessage.WriteString("\n\nResponse:\n")
-		if err = writeJSON(detailMessage, response); err != nil {
-			detailMessage.Write(response)
-		}
-
-		service.log.Debug(detailMessage)
-	}
-	return response, nil
-}
-
-func writeJSON(writer *bytes.Buffer, data []byte) error {
-	buf := new(bytes.Buffer)
-	if err := json.Indent(buf, data, "", "  "); err != nil {
-		return err
-	}
-
-	writer.Write(buf.Bytes())
-
-	return nil
 }
