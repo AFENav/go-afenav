@@ -20,7 +20,7 @@ type openResponse struct {
 func (service *Service) SearchAndOpenReadonly(documentType string, searchString string) (DocumentHandle, error) {
 	var response openResponse
 	if err := service.invokeJSON("/api/Documents/SearchAndOpenReadonly", searchAndOpenReadonlyRequest{
-		AuthenticationToken: service.AuthenticationToken,
+		AuthenticationToken: service.authenticationToken,
 		DocumentType:        documentType,
 		SearchString:        searchString,
 	}, &response); err != nil {
@@ -34,7 +34,7 @@ func (service *Service) SearchAndOpenReadonly(documentType string, searchString 
 func (service *Service) SearchAndOpen(documentType string, searchString string) (DocumentHandle, error) {
 	var response openResponse
 	if err := service.invokeJSON("/api/Documents/SearchAndOpen", searchAndOpenRequest{
-		AuthenticationToken: service.AuthenticationToken,
+		AuthenticationToken: service.authenticationToken,
 		DocumentType:        documentType,
 		SearchString:        searchString,
 	}, &response); err != nil {

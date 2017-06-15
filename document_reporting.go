@@ -39,7 +39,7 @@ type DocumentSummaryRow struct {
 func (service *Service) ListDocuments(documentType string) ([]DocumentID, error) {
 	var response DocumentSummaryResponse
 	if err := service.invokeJSON("/api/Documents/Summary", documentSummaryRequest{
-		AuthenticationToken: service.AuthenticationToken,
+		AuthenticationToken: service.authenticationToken,
 		Type:                documentType,
 		BaseFilter:          "All",
 		RowStartIndex:       0,

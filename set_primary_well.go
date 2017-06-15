@@ -9,7 +9,7 @@ type setPrimaryWellRequest struct {
 // SetPrimaryWell will mark a well list item as the primary well.  The record must already exist.
 func (service *Service) SetPrimaryWell(documentHandle DocumentHandle, listItemID ListItemID) error {
 	if err := service.invokeJSON("/api/Afe/SetPrimaryWell", setPrimaryWellRequest{
-		AuthenticationToken: service.AuthenticationToken,
+		AuthenticationToken: service.authenticationToken,
 		DocumentHandle:      documentHandle,
 		ListItemID:          listItemID,
 	}, nil); err != nil {

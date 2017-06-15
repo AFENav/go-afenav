@@ -85,7 +85,7 @@ type documentReadRequest struct {
 func (service *Service) ReadDocument(handle DocumentHandle, serializeDocumentTypes []string) (*DocumentReadResponse, error) {
 	var response DocumentReadResponse
 	if err := service.invokeJSON("/api/Documents/Read", documentReadRequest{
-		AuthenticationToken:    service.AuthenticationToken,
+		AuthenticationToken:    service.authenticationToken,
 		DocumentHandle:         string(handle),
 		SerializeDocumentTypes: serializeDocumentTypes,
 	}, &response); err != nil {
@@ -106,7 +106,7 @@ type readCurrentRequest struct {
 func (service *Service) ReadCurrent(documentType string, documentID DocumentID, serializeDocumentTypes []string) (*DocumentReadResponse, error) {
 	var response DocumentReadResponse
 	if err := service.invokeJSON("/api/Documents/ReadCurrent", readCurrentRequest{
-		AuthenticationToken:    service.AuthenticationToken,
+		AuthenticationToken:    service.authenticationToken,
 		DocumentType:           documentType,
 		DocumentID:             documentID,
 		SerializeDocumentTypes: serializeDocumentTypes,

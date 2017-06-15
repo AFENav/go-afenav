@@ -14,12 +14,12 @@ import (
 
 // Service represents an instance of an AFE Navigator Service with configuration and state
 type Service struct {
-	url string
-	log *logging.Logger
+	url                 string
+	log                 *logging.Logger
+	authenticationToken authenticationToken
 
-	InsecureSkipVerify  bool
-	AuthenticationToken authenticationToken
-	LogRequests         bool
+	InsecureSkipVerify bool
+	LogRequests        bool
 }
 
 // New returns a new instance of an AFE Navigator Service

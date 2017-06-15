@@ -21,22 +21,22 @@ func (service *Service) Login(username, password string) error {
 		return err
 	}
 
-	service.AuthenticationToken = response.AuthenticationToken
+	service.authenticationToken = response.AuthenticationToken
 
 	return nil
 }
 
 // Logout terminates the active session and erases the authenticationToken
 func (service *Service) Logout() error {
-	if service.AuthenticationToken == "" {
+	if service.authenticationToken == "" {
 		return errors.New("Not logged in")
 	}
 	if err := service.invokeJSON("/api/Authentication/Logout", authenticationTokenRequest{
-		AuthenticationToken: service.AuthenticationToken,
+		AuthenticationToken: service.authenticationToken,
 	}, nil); err != nil {
 		return err
 	}
 
-	service.AuthenticationToken = ""
+	service.authenticationToken = ""
 	return nil
 }
