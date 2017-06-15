@@ -1,59 +1,71 @@
 package afenav
 
-type documentSummaryRequest struct {
-	AuthenticationToken      authenticationToken
-	Type                     string
-	ColumnIds                []DocumentSummaryColumn
-	BaseFilter               string
-	TopLevelSearch           string
-	ColumnSorts              []DocumentSummaryColumnSort
-	RowStartIndex            int32
-	Count                    int32
-	UnformattedNumericValues bool
-	Echo                     int32
+type executeReportRequest struct {
+	ReportQuery
+	AuthenticationToken authenticationToken
 }
 
-// DocumentSummaryColumn represents a column to include in browse results
-type DocumentSummaryColumn struct {
-	ColumnID string `json:"Id"`
-	Filter   string
+// ReportQuery defines a request to the Document Reporting API
+type ReportQuery struct {
+	DocumentType    string
+	ReportType      string
+	Columns         []string
+	SortColumns     []ReportSortColumn
+	GlobalSearch    string
+	Filter          []ReportFilter
+	SkipRows        int
+	MaxRowCount     int
+	IncludeArchived bool
 }
 
-// DocumentSummaryColumnSort represents a column to sort on
-type DocumentSummaryColumnSort struct {
-	ColumnID      string `json:"Id"`
-	SortAscending bool
+// ReportSortColumn defines a sorting column and direction
+type ReportSortColumn struct {
+	Column    string
+	Ascending bool
 }
 
-// DocumentSummaryResponse represents a response from the reporting API
-type DocumentSummaryResponse struct {
-	Rows []DocumentSummaryRow
+// ReportFilter represents a report filter clause
+type ReportFilter struct {
+	LeftParenthesis  string
+	Column           string
+	Operator         string
+	Value            string
+	RightParenthesis string
+	Join             string
 }
 
-// DocumentSummaryRow represents a single row from the reporting API
-type DocumentSummaryRow struct {
-	DocumentID DocumentID `json:"Id"`
+// ExecuteReportResponse represents the response from the ExecuteReport API
+type ExecuteReportResponse struct {
+	TotalRowCount    int
+	FilteredRowCount int
+	ElapsedTimeMS    float64
+	Columns          []ExecuteReportColumn
+	Rows             []ExecuteReportRow
 }
 
-// ListDocuments lists all DocumentIDs for Documents of a specific DocumentType
-func (service *Service) ListDocuments(documentType string) ([]DocumentID, error) {
-	var response DocumentSummaryResponse
-	if err := service.invokeJSON("/api/Documents/Summary", documentSummaryRequest{
+//ExecuteReportColumn represents column information returns from the ExecuteReport API
+type ExecuteReportColumn struct {
+	UniqueDisplayName string
+	ColumnID          string `json:"ColumnId"`
+	Name              string
+	Type              string
+}
+
+// ExecuteReportRow represents a row of display friendly data from the ExecuteReport API
+type ExecuteReportRow struct {
+	DocumentID DocumentID `json:"DocumentId"`
+	Data       []string
+}
+
+// ExecuteReport executes a document report and returns the formatted results
+func (service *Service) ExecuteReport(query ReportQuery) (*ExecuteReportResponse, error) {
+	var response ExecuteReportResponse
+
+	if err := service.invokeJSON("/api/Documents/Reporting/Execute", executeReportRequest{
+		ReportQuery:         query,
 		AuthenticationToken: service.authenticationToken,
-		Type:                documentType,
-		BaseFilter:          "All",
-		RowStartIndex:       0,
-		Echo:                1,
-		ColumnSorts:         []DocumentSummaryColumnSort{},
-		ColumnIds:           []DocumentSummaryColumn{},
-		Count:               999999,
 	}, &response); err != nil {
 		return nil, err
 	}
-
-	ids := make([]DocumentID, len(response.Rows))
-	for i := 0; i < len(response.Rows); i++ {
-		ids[i] = response.Rows[i].DocumentID
-	}
-	return ids, nil
+	return &response, nil
 }

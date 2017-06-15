@@ -35,38 +35,45 @@ func New(url string) *Service {
 // invokeJSON calls an JSON API marshalling the request object, and unmarshalling into the response object
 // response will be nil of error != nil
 func (service *Service) invokeJSON(api string, request interface{}, response interface{}) error {
+	detailMessage := new(bytes.Buffer)
+
+	detailMessage.WriteString("POST: " + api + "\n")
+
+	if service.LogRequests {
+		defer func() {
+			service.log.Debug(detailMessage)
+		}()
+	}
+
 	requestBytes, err := json.Marshal(request)
 	if err != nil {
+		detailMessage.WriteString(err.Error())
 		service.log.Errorf("Failure invoking %v: %v", api, err)
 		return err
 	}
 
+	detailMessage.WriteString("\nRequest:\n")
+	json.Indent(detailMessage, requestBytes, "", " ")
+	detailMessage.WriteString("\n\nResponse:\n")
+
 	responseBytes, err := service.invoke(api, requestBytes)
 	if err != nil {
+		detailMessage.Write(responseBytes)
 		service.log.Errorf("Failure invoking %v: %v", api, err)
 		return err
 	}
 
 	if response != nil {
 		if err := json.Unmarshal(responseBytes, &response); err != nil {
+			detailMessage.Write(responseBytes)
 			service.log.Errorf("Failure invoking %v: %v", api, err)
 			return err
 		}
 	}
 
+	json.Indent(detailMessage, responseBytes, "", " ")
+
 	service.log.Debugf("Successfully invoked %v", api)
-
-	if service.LogRequests {
-		detailMessage := new(bytes.Buffer)
-
-		detailMessage.WriteString("POST: " + api + "\n")
-		detailMessage.WriteString("\nRequest:\n")
-		json.Indent(detailMessage, requestBytes, "", " ")
-		detailMessage.WriteString("\n\nResponse:\n")
-		json.Indent(detailMessage, responseBytes, "", " ")
-
-		service.log.Debug(detailMessage)
-	}
 
 	return nil
 }
