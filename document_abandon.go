@@ -2,7 +2,7 @@ package afenav
 
 // AbandonDocument discards pending changes to a document handle!
 func (service *Service) AbandonDocument(handle DocumentHandle) error {
-	if err := service.invokeJSON("/api/Documents/AbandonChanges", documentHandleRequest{
+	if err := service.invoke("/api/Documents/AbandonChanges", documentHandleRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentHandle:      string(handle),
 	}, nil); err != nil {

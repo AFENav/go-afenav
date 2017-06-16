@@ -61,7 +61,7 @@ type ExecuteReportRow struct {
 func (service *Service) ExecuteReport(query ReportQuery) (*ExecuteReportResponse, error) {
 	var response ExecuteReportResponse
 
-	if err := service.invokeJSON("/api/Documents/Reporting/Execute", executeReportRequest{
+	if err := service.invoke("/api/Documents/Reporting/Execute", executeReportRequest{
 		ReportQuery:         query,
 		AuthenticationToken: service.authenticationToken,
 	}, &response); err != nil {

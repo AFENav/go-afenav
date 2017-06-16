@@ -13,7 +13,7 @@ type createResponse struct {
 // CreateDocument creates a new document of a specified type and returns the Document ID and Document Handle
 func (service *Service) CreateDocument(documentType string) (DocumentID, DocumentHandle, error) {
 	var response createResponse
-	if err := service.invokeJSON("/api/Documents/Create", createRequest{
+	if err := service.invoke("/api/Documents/Create", createRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentType:        documentType,
 	}, &response); err != nil {

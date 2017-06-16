@@ -60,7 +60,7 @@ type updateBooleanRequest struct {
 
 // UpdateText sets the value for a text field on a document
 func (service *Service) UpdateText(documentHandle DocumentHandle, path []string, field string, value string) error {
-	if err := service.invokeJSON("/api/Documents/Field/UpdateText", updateTextRequest{
+	if err := service.invoke("/api/Documents/Field/UpdateText", updateTextRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentHandle:      documentHandle,
 		FieldPath:           path,
@@ -74,7 +74,7 @@ func (service *Service) UpdateText(documentHandle DocumentHandle, path []string,
 
 // UpdateDocumentReference updates the value for a document field on a document
 func (service *Service) UpdateDocumentReference(documentHandle DocumentHandle, path []string, field string, value DocumentID) error {
-	if err := service.invokeJSON("/api/Documents/Field/UpdateDocumentReference", updateDocumentReferenceRequest{
+	if err := service.invoke("/api/Documents/Field/UpdateDocumentReference", updateDocumentReferenceRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentHandle:      documentHandle,
 		FieldPath:           path,
@@ -88,7 +88,7 @@ func (service *Service) UpdateDocumentReference(documentHandle DocumentHandle, p
 
 // UpdateUWI updates the value for a UWI type field on a document
 func (service *Service) UpdateUWI(documentHandle DocumentHandle, path []string, field string, value string) error {
-	if err := service.invokeJSON("/api/Documents/Field/UpdateUwi", updateUwiRequest{
+	if err := service.invoke("/api/Documents/Field/UpdateUwi", updateUwiRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentHandle:      documentHandle,
 		FieldPath:           path,
@@ -102,7 +102,7 @@ func (service *Service) UpdateUWI(documentHandle DocumentHandle, path []string, 
 
 // UpdateInteger updates the value for an integer field on a document
 func (service *Service) UpdateInteger(documentHandle DocumentHandle, path []string, field string, value int) error {
-	if err := service.invokeJSON("/api/Documents/Field/UpdateInteger", updateIntegerRequest{
+	if err := service.invoke("/api/Documents/Field/UpdateInteger", updateIntegerRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentHandle:      documentHandle,
 		FieldPath:           path,
@@ -116,7 +116,7 @@ func (service *Service) UpdateInteger(documentHandle DocumentHandle, path []stri
 
 // UpdateDecimal updates the value for a decimal field on a document
 func (service *Service) UpdateDecimal(documentHandle DocumentHandle, path []string, field string, value float64) error {
-	if err := service.invokeJSON("/api/Documents/Field/UpdateDecimal", updateDecimalRequest{
+	if err := service.invoke("/api/Documents/Field/UpdateDecimal", updateDecimalRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentHandle:      documentHandle,
 		FieldPath:           path,
@@ -130,7 +130,7 @@ func (service *Service) UpdateDecimal(documentHandle DocumentHandle, path []stri
 
 // UpdateBoolean updates the value for a boolean field for a document
 func (service *Service) UpdateBoolean(documentHandle DocumentHandle, path []string, field string, value bool) error {
-	if err := service.invokeJSON("/api/Documents/Field/UpdateBoolean", updateBooleanRequest{
+	if err := service.invoke("/api/Documents/Field/UpdateBoolean", updateBooleanRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentHandle:      documentHandle,
 		FieldPath:           path,
@@ -144,7 +144,7 @@ func (service *Service) UpdateBoolean(documentHandle DocumentHandle, path []stri
 
 // UpdateDate updates the value for a date/time field for a document
 func (service *Service) UpdateDate(documentHandle DocumentHandle, path []string, field string, value time.Time) error {
-	if err := service.invokeJSON("/api/Documents/Field/UpdateDate", updateDateRequest{
+	if err := service.invoke("/api/Documents/Field/UpdateDate", updateDateRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentHandle:      documentHandle,
 		FieldPath:           path,
@@ -170,7 +170,7 @@ type createRecordListItemResponse struct {
 // AddListItem adds a new item to a record list field
 func (service *Service) AddListItem(handle DocumentHandle, path []string, field string) (ListItemID, error) {
 	var response createRecordListItemResponse
-	if err := service.invokeJSON("/api/Documents/Field/CreateRecordListItem", createRecordListItemRequest{
+	if err := service.invoke("/api/Documents/Field/CreateRecordListItem", createRecordListItemRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentHandle:      handle,
 		FieldName:           field,
@@ -190,7 +190,7 @@ type removeRecordListItemRequest struct {
 
 // RemoveListItem adds a new item to a record list field
 func (service *Service) RemoveListItem(handle DocumentHandle, path []string, field string, listItem ListItemID) error {
-	if err := service.invokeJSON("/api/Documents/Field/RemoveRecordListItem", createRecordListItemRequest{
+	if err := service.invoke("/api/Documents/Field/RemoveRecordListItem", createRecordListItemRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentHandle:      handle,
 		FieldName:           field,

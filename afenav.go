@@ -32,54 +32,9 @@ func New(url string) *Service {
 
 // ---------------------------------- API HELPER METHODS -------------------------------------------
 
-// invokeJSON calls an JSON API marshalling the request object, and unmarshalling into the response object
+// invoke calls an JSON API marshalling the request object, and unmarshalling into the response object
 // response will be nil of error != nil
-func (service *Service) invokeJSON(api string, request interface{}, response interface{}) error {
-	detailMessage := new(bytes.Buffer)
-
-	detailMessage.WriteString("POST: " + api + "\n")
-
-	if service.LogRequests {
-		defer func() {
-			service.log.Debug(detailMessage)
-		}()
-	}
-
-	requestBytes, err := json.Marshal(request)
-	if err != nil {
-		detailMessage.WriteString(err.Error())
-		service.log.Errorf("Failure invoking %v: %v", api, err)
-		return err
-	}
-
-	detailMessage.WriteString("\nRequest:\n")
-	json.Indent(detailMessage, requestBytes, "", " ")
-	detailMessage.WriteString("\n\nResponse:\n")
-
-	responseBytes, err := service.invoke(api, requestBytes)
-	if err != nil {
-		detailMessage.Write(responseBytes)
-		service.log.Errorf("Failure invoking %v: %v", api, err)
-		return err
-	}
-
-	if response != nil {
-		if err := json.Unmarshal(responseBytes, &response); err != nil {
-			detailMessage.Write(responseBytes)
-			service.log.Errorf("Failure invoking %v: %v", api, err)
-			return err
-		}
-	}
-
-	json.Indent(detailMessage, responseBytes, "", " ")
-
-	service.log.Debugf("Successfully invoked %v", api)
-
-	return nil
-}
-
-func (service *Service) invoke(api string, request []byte) ([]byte, error) {
-
+func (service *Service) invoke(api string, request interface{}, response interface{}) error {
 	// TLS configuration to bypass TLS check if we are using a self-signed cert
 	tlsClientConfig := &tls.Config{
 		InsecureSkipVerify: service.InsecureSkipVerify,
@@ -93,14 +48,36 @@ func (service *Service) invoke(api string, request []byte) ([]byte, error) {
 
 	client := &http.Client{Transport: tr}
 
-	req, _ := http.NewRequest("POST", service.url+api, bytes.NewReader(request))
+	detailMessage := new(bytes.Buffer)
+
+	if service.LogRequests {
+		defer func() {
+			service.log.Debug(detailMessage)
+		}()
+	}
+
+	detailMessage.WriteString("POST: " + api + "\n")
+
+	requestBytes, err := json.Marshal(request)
+	if err != nil {
+		detailMessage.WriteString(err.Error())
+		service.log.Errorf("Failure marshalling %v: %v", api, err)
+		return err
+	}
+
+	detailMessage.WriteString("\nRequest:\n")
+	json.Indent(detailMessage, requestBytes, "", " ")
+
+	detailMessage.WriteString("\n\nResponse:\n")
+
+	req, _ := http.NewRequest("POST", service.url+api, bytes.NewReader(requestBytes))
 
 	// indicate to AFE Nav Service that we're calling the JSON APIs (as opposed to XML)
 	req.Header.Add("Content-type", "application/json")
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if resp.StatusCode == http.StatusInternalServerError {
@@ -109,18 +86,30 @@ func (service *Service) invoke(api string, request []byte) ([]byte, error) {
 		decoder := json.NewDecoder(resp.Body)
 		err = decoder.Decode(&serviceError)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		return nil, errors.New(serviceError.Message)
+		return errors.New(serviceError.Message)
 	}
 
 	if resp.StatusCode == http.StatusNotFound {
-		return nil, errors.New("Invalid API")
+		return errors.New("Unknown API")
 	}
 
 	responseBuffer := new(bytes.Buffer)
 	responseBuffer.ReadFrom(resp.Body)
+	responseBytes := responseBuffer.Bytes()
 
-	return responseBuffer.Bytes(), nil
+	if response != nil {
+		if err := json.Unmarshal(responseBytes, &response); err != nil {
+			detailMessage.Write(responseBytes)
+			service.log.Errorf("Failure unmarshalling response for %v: %v", api, err)
+			return err
+		}
+	}
 
+	json.Indent(detailMessage, responseBytes, "", " ")
+
+	service.log.Debugf("Successfully invoked %v", api)
+
+	return nil
 }

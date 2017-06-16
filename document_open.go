@@ -19,7 +19,7 @@ type openResponse struct {
 // SearchAndOpenReadonly searches for and opens a readonly handle to a document of a given type
 func (service *Service) SearchAndOpenReadonly(documentType string, searchString string) (DocumentHandle, error) {
 	var response openResponse
-	if err := service.invokeJSON("/api/Documents/SearchAndOpenReadonly", searchAndOpenReadonlyRequest{
+	if err := service.invoke("/api/Documents/SearchAndOpenReadonly", searchAndOpenReadonlyRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentType:        documentType,
 		SearchString:        searchString,
@@ -33,7 +33,7 @@ func (service *Service) SearchAndOpenReadonly(documentType string, searchString 
 // SearchAndOpen searches for and opens a read/write handle to a document of a given type
 func (service *Service) SearchAndOpen(documentType string, searchString string) (DocumentHandle, error) {
 	var response openResponse
-	if err := service.invokeJSON("/api/Documents/SearchAndOpen", searchAndOpenRequest{
+	if err := service.invoke("/api/Documents/SearchAndOpen", searchAndOpenRequest{
 		AuthenticationToken: service.authenticationToken,
 		DocumentType:        documentType,
 		SearchString:        searchString,

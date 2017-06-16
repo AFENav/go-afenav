@@ -14,7 +14,7 @@ type loginResponse struct {
 // Login opens a session against the AFE Navigator Service and stores the authenticationToken
 func (service *Service) Login(username, password string) error {
 	var response loginResponse
-	if err := service.invokeJSON("/api/Authentication/Login", loginRequest{
+	if err := service.invoke("/api/Authentication/Login", loginRequest{
 		Username: username,
 		Password: password,
 	}, &response); err != nil {
@@ -31,7 +31,7 @@ func (service *Service) Logout() error {
 	if service.authenticationToken == "" {
 		return errors.New("Not logged in")
 	}
-	if err := service.invokeJSON("/api/Authentication/Logout", authenticationTokenRequest{
+	if err := service.invoke("/api/Authentication/Logout", authenticationTokenRequest{
 		AuthenticationToken: service.authenticationToken,
 	}, nil); err != nil {
 		return err

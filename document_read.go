@@ -84,7 +84,7 @@ type documentReadRequest struct {
 // ReadDocument reads the full contents of the provided document, and any references document types listed in serializeDocumentTypes
 func (service *Service) ReadDocument(handle DocumentHandle, serializeDocumentTypes []string) (*DocumentReadResponse, error) {
 	var response DocumentReadResponse
-	if err := service.invokeJSON("/api/Documents/Read", documentReadRequest{
+	if err := service.invoke("/api/Documents/Read", documentReadRequest{
 		AuthenticationToken:    service.authenticationToken,
 		DocumentHandle:         string(handle),
 		SerializeDocumentTypes: serializeDocumentTypes,
@@ -105,7 +105,7 @@ type readCurrentRequest struct {
 // ReadCurrent returns a snapshot of the current data for a document
 func (service *Service) ReadCurrent(documentType string, documentID DocumentID, serializeDocumentTypes []string) (*DocumentReadResponse, error) {
 	var response DocumentReadResponse
-	if err := service.invokeJSON("/api/Documents/ReadCurrent", readCurrentRequest{
+	if err := service.invoke("/api/Documents/ReadCurrent", readCurrentRequest{
 		AuthenticationToken:    service.authenticationToken,
 		DocumentType:           documentType,
 		DocumentID:             documentID,
