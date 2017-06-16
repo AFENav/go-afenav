@@ -1,7 +1,7 @@
 package main
 
 import (
-	"path"
+	"path/filepath"
 
 	"fmt"
 	"github.com/AFENav/go-afenav"
@@ -26,7 +26,7 @@ type Config struct {
 
 func main() {
 	var config Config
-	if _, err := toml.DecodeFile(path.Join("..", "service.config"), &config); err != nil {
+	if _, err := toml.DecodeFile(filepath.Join("..", "service.config"), &config); err != nil {
 		panic(err)
 	}
 

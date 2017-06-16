@@ -3,10 +3,9 @@ package main
 import (
 	"time"
 
-	"path"
-
 	"github.com/AFENav/go-afenav"
 	"github.com/BurntSushi/toml"
+	"path/filepath"
 )
 
 // =============================================================
@@ -28,7 +27,7 @@ type Config struct {
 func main() {
 
 	var config Config
-	if _, err := toml.DecodeFile(path.Join("..", "service.config"), &config); err != nil {
+	if _, err := toml.DecodeFile(filepath.Join("..", "service.config"), &config); err != nil {
 		panic(err)
 	}
 
