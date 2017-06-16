@@ -52,6 +52,25 @@ func main() {
 	// always close document handles to avoid keeping locks on them
 	defer service.CloseDocument(documentHandle)
 
+
+	// update AFE Type PAA by searching for DocumentID for "DRILLING" and then setting CUSTOM/AFE_TYPE
+	var drillingDocumentID afenav.DocumentID
+	if drillingDocumentID, err = service.FindDocument("LUT_AFE_TYPE", "DRILLING"); err != nil {
+		panic(err)
+	}
+	if err = service.UpdateDocumentReference(documentHandle, []string{"CUSTOM"}, "AFE_TYPE", drillingDocumentID); err != nil {
+		panic(err)
+	}
+
+	// update Operator Status PAA by searching for DocumentID for "DRILLING" and then setting CUSTOM/AFE_TYPE
+	var operatedStatus afenav.DocumentID
+	if operatedStatus, err = service.FindDocument("LUT_OPRTR_STTS", "Operated"); err != nil {
+		panic(err)
+	}
+	if err = service.UpdateDocumentReference(documentHandle, []string{"CUSTOM"}, "OPERATOR_STATUS", operatedStatus); err != nil {
+		panic(err)
+	}
+
 	if err = service.UpdateText(documentHandle, []string{}, "DESCRIPTION", "Hello World"); err != nil {
 		panic(err)
 	}
@@ -74,6 +93,12 @@ func main() {
 	}
 
 	if err = service.UpdateUWI(documentHandle, []string{"WELL", string(listItemID)}, "UWI", "81278126378678"); err != nil {
+		panic(err)
+	}
+	if err = service.UpdateDecimal(documentHandle, []string{"WELL", string(listItemID)}, "UWI_LAT", -114.1234); err != nil {
+		panic(err)
+	}
+	if err = service.UpdateDecimal(documentHandle, []string{"WELL", string(listItemID)}, "UWI_LONG", 100.123); err != nil {
 		panic(err)
 	}
 
