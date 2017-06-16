@@ -1,4 +1,4 @@
-URL = "https://afenav.company.com/
+URL = "https://afenav.company.com/"
 Username = "API User"
 Password = ""
 InsecureSkipVerify = false
